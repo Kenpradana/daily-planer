@@ -1,6 +1,7 @@
 {
   "name": "daily-planner",
   "version": "2.0.0",
+  "type": "module",
   "description": "Daily Planner — Vercel + Supabase",
   "scripts": {
     "dev": "vercel dev",
