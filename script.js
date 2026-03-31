@@ -97,11 +97,9 @@ function setSyncStatus(online) {
 ======================================== */
 async function fetchMonthData() {
   try {
-    // ▼▼▼ BARU: pakai ?view=month (bukan /month) ▼▼▼
     const rows = await apiFetch(
       `${API}?view=month&year=${currentYear}&month=${currentMonth + 1}`
     );
-    // Group by date_key
     monthCache = {};
     rows.forEach(row => {
       if (!monthCache[row.date_key]) monthCache[row.date_key] = [];
@@ -479,7 +477,6 @@ async function addTask(text, time, note, category) {
 ======================================== */
 async function updateStats() {
   try {
-    // ▼▼▼ BARU: pakai ?view=stats (bukan /stats) ▼▼▼
     const data = await apiFetch(`${API}?view=stats`);
     document.getElementById('statTotal').textContent = data.total;
     document.getElementById('statDone').textContent = data.done;
