@@ -582,6 +582,103 @@ function showToast(msg, type) {
   container.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);
 }
+/* ========================================
+   NOTIFIKASI TASK (HP & PC)
+======================================== */
+let notifiedTasks = new Set(); // biar tidak spam notif yang sama
+
+function requestNotifPermission() {
+  if (!('Notification' in window)) {
+    showToast('Browser ini tidak support notifikasi', 'error');
+    return;
+  }
+  
+  if (Notification.permission === 'granted') {
+    updateNotifUI(true);
+    return;
+  }
+
+  Notification.requestPermission().then(permission => {
+    updateNotifUI(permission === 'granted');
+    if (permission === 'granted') {
+      showToast('Notifikasi aktif! Kamu akan diingatkan saat waktunya.', 'success');
+    } else if (permission === 'denied') {
+      showToast('Notifikasi diblokir. Aktifkan di pengaturan browser.', 'error');
+    }
+  });
+}
+
+function updateNotifUI(granted) {
+  const icon = document.getElementById('notifIcon');
+  const label = document.getElementById('notifLabel');
+  const btn = document.getElementById('notifBtn');
+  if (granted) {
+    icon.className = 'fa-solid fa-bell';
+    label.textContent = 'Aktif';
+    btn.style.color = '#00d4aa';
+  } else {
+    icon.className = 'fa-solid fa-bell-slash';
+    label.textContent = 'Mati';
+    btn.style.color = '';
+  }
+}
+
+function startReminderChecker() {
+  // Cek setiap 30 detik
+  setInterval(checkTaskReminders, 30000);
+  // Juga cek saat pertama kali load
+  checkTaskReminders();
+}
+
+async function checkTaskReminders() {
+  if (!selectedDate) return;
+  if (Notification.permission !== 'granted') return;
+
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+  // Hanya cek task hari ini
+  if (selectedDate !== todayStr) return;
+
+  const dayTasks = monthCache[selectedDate] || [];
+  const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+  dayTasks.forEach(task => {
+    if (!task.time) return;            // skip yang tidak punya waktu
+    if (task.done) return;             // skip yang sudah selesai
+    if (notifiedTasks.has(task.id)) return; // skip yang sudah di-notif
+
+    // Cek apakah waktu task = waktu sekarang
+    if (task.time === currentTime) {
+      notifiedTasks.add(task.id);
+      sendNotification(task);
+    }
+  });
+}
+
+function sendNotification(task) {
+  const cat = CATEGORY_LABELS[task.category] || 'Lainnya';
+
+  // Notifikasi browser (muncul di luar app)
+  if ('Notification' in window && Notification.permission === 'granted') {
+    const notif = new Notification(`⏰ ${task.time} — ${cat}`, {
+      body: task.text + (task.note ? `\n📋 ${task.note}` : ''),
+      icon: 'https://daily-planner-orpin.vercel.app/favicon.ico',
+      tag: String(task.id),   // anti-duplikat
+      requireInteraction: true // tetap tampil sampai user klik
+    });
+
+    // Saat notif diklik → buka tab/buka app
+    notif.onclick = () => {
+      window.focus();
+      selectDate(selectedDate);
+      notif.close();
+    };
+  }
+
+  // Juga tampilkan toast di dalam app sebagai backup
+  showToast(`${task.time} — ${task.text}`, 'info');
+}
 
 /* ========================================
    INIT
@@ -595,19 +692,22 @@ function showToast(msg, type) {
   currentMonth = now.getMonth();
   selectedDate = todayKey();
 
+  // ▼▼▼ TAMBAHKAN 2 BARIS INI ▼▼▼
+  requestNotifPermission();
+  startReminderChecker();
+  // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
   try {
-    // Cek koneksi & ambil data awal
     await fetchMonthData();
     setSyncStatus(true);
   } catch {
     setSyncStatus(false);
   }
 
-  // Render kalender (pakai cache yang sudah di-fetch)
   renderCalendarSilent();
   renderTasks();
+  updateStats();
 
-  // Sembunyikan loading, tampilkan app
   loadingOverlay.classList.add('hidden');
   appContainer.style.opacity = '1';
   setTimeout(() => loadingOverlay.remove(), 600);

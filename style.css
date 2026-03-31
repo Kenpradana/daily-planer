@@ -569,3 +569,13 @@ body::before {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Tombol Notifikasi */
+.notif-btn {
+  cursor: pointer !important;
+  transition: all 0.2s;
+}
+.notif-btn:hover {
+  background: var(--card-hover, #1e2533) !important;
+  border-color: rgba(0,212,170,0.3) !important;
+}
