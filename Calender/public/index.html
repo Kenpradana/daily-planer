@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="bg-glow"></div>
+  <div class="bg-glow-2"></div>
+
+  <!-- LOADING OVERLAY -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <p>Menghubungkan ke server...</p>
+  </div>
+
+  <div class="app-container" id="appContainer" style="opacity:0;">
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="app-logo">
+        <div class="app-logo-icon"><i class="fa-solid fa-calendar-check"></i></div>
+        <h1>Daily<span>Planner</span></h1>
+      </div>
+      <div class="header-stats">
+        <div class="stat-chip accent">
+          <i class="fa-solid fa-list-check"></i>
+          <span>Total: <span class="stat-val" id="statTotal">0</span></span>
+        </div>
+        <div class="stat-chip success">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Selesai: <span class="stat-val" id="statDone">0</span></span>
+        </div>
+        <div class="stat-chip" id="syncChip" title="Status koneksi database">
+          <i class="fa-solid fa-database" id="syncIcon"></i>
+          <span class="stat-val" id="syncLabel">Terhubung</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- CALENDAR -->
+    <section class="calendar-panel" aria-label="Kalender">
+      <div class="calendar-nav">
+        <div class="month-label" id="monthLabel"></div>
+        <div class="nav-btns">
+          <button class="nav-btn" id="prevMonth" aria-label="Bulan sebelumnya">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <button class="nav-btn today-btn" id="todayBtn">Hari ini</button>
+          <button class="nav-btn" id="nextMonth" aria-label="Bulan berikutnya">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+      <div class="calendar-grid" id="calendarGrid">
+        <div class="weekday-row">
+          <div class="weekday-cell">Min</div>
+          <div class="weekday-cell">Sen</div>
+          <div class="weekday-cell">Sel</div>
+          <div class="weekday-cell">Rab</div>
+          <div class="weekday-cell">Kam</div>
+          <div class="weekday-cell">Jum</div>
+          <div class="weekday-cell">Sab</div>
+        </div>
+        <div class="days-grid" id="daysGrid"></div>
+      </div>
+    </section>
+
+    <!-- TASK PANEL -->
+    <aside class="task-panel" aria-label="Daftar tugas">
+      <div class="task-panel-header">
+        <div class="task-date-label" id="taskDateLabel"></div>
+        <button class="add-task-btn" id="addTaskBtn" aria-label="Tambah tugas">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+
+      <div class="progress-section" id="progressSection" style="display:none;">
+        <div class="progress-header">
+          <span class="progress-label">Progress Hari Ini</span>
+          <span class="progress-pct" id="progressPct">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="task-list" id="taskList"></div>
+    </aside>
+  </div>
+
+  <!-- MODAL TAMBAH TASK -->
+  <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-label="Tambah tugas baru">
+    <div class="modal">
+      <div class="modal-title">Tambah Tugas Baru</div>
+      <div class="form-group">
+        <label for="taskInput">Nama Tugas</label>
+        <input type="text" class="form-input" id="taskInput" placeholder="Apa yang ingin kamu kerjakan?" maxlength="120" autocomplete="off">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="taskTime">Waktu</label>
+          <input type="time" class="form-input" id="taskTime">
+        </div>
+        <div class="form-group">
+          <label for="taskNote">Catatan (opsional)</label>
+          <input type="text" class="form-input" id="taskNote" placeholder="Tambah catatan..." maxlength="80">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Kategori</label>
+        <div class="category-options" id="categoryOptions">
+          <button class="cat-option active" data-cat="work">Kerja</button>
+          <button class="cat-option" data-cat="personal">Pribadi</button>
+          <button class="cat-option" data-cat="health">Kesehatan</button>
+          <button class="cat-option" data-cat="study">Belajar</button>
+          <button class="cat-option" data-cat="other">Lainnya</button>
+        </div>
+      </div>
+      <div class="modal-btns">
+        <button class="modal-btn cancel" id="modalCancel">Batal</button>
+        <button class="modal-btn submit" id="modalSubmit">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

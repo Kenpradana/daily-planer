@@ -1,0 +1,15 @@
+{
+  "name": "daily-planner",
+  "version": "2.0.0",
+  "description": "Daily Planner — Vercel + Supabase",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "vercel": "^33.0.0"
+  }
+}
