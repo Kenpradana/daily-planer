@@ -473,16 +473,13 @@ async function addTask(text, time, note, category) {
 }
 
 /* ========================================
-   STATISTIK GLOBAL
+   STATISTIK (per tanggal yang dipilih)
 ======================================== */
-async function updateStats() {
-  try {
-    const data = await apiFetch(`${API}?view=stats`);
-    document.getElementById('statTotal').textContent = data.total;
-    document.getElementById('statDone').textContent = data.done;
-  } catch {
-    // Biarkan angka lama jika gagal
-  }
+function updateStats() {
+  const dayTasks = monthCache[selectedDate] || [];
+  const done = dayTasks.filter(t => t.done).length;
+  document.getElementById('statTotal').textContent = dayTasks.length;
+  document.getElementById('statDone').textContent = done;
 }
 /* ========================================
    MODAL LOGIC
@@ -600,10 +597,7 @@ function showToast(msg, type) {
 
   try {
     // Cek koneksi & ambil data awal
-    await Promise.all([
-      fetchMonthData(),
-      updateStats()
-    ]);
+    await fetchMonthData();
     setSyncStatus(true);
   } catch {
     setSyncStatus(false);
