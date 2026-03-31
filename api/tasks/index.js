@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase } from '../lib/supabase.js';
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
